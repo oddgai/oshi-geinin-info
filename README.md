@@ -10,5 +10,5 @@ docker compose up
 # DELETE
 
 ```
-docker-compose down --rmi all --volumes --remove-orphans
+docker compose down --rmi all --volumes --remove-orphans
 ```
