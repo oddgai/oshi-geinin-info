@@ -9,6 +9,7 @@
   "dependencies": {
     "@oshi-geinin/db": "*",
     "@oshi-geinin/shared": "*",
+    "cheerio": "^1",
     "crawlee": "^3",
     "playwright": "^1",
     "@sparticuz/chromium": "^131"
