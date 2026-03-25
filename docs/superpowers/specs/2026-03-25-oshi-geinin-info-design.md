@@ -63,7 +63,7 @@
 | スケジューラー | EventBridge (1日1回クロール + 1日1回配信終了リマインド) |
 | 通知 | LINE Messaging API |
 | 認証 | LINEログイン (NextAuth.js) |
-| IaC | SST or AWS CDK |
+| IaC | SST (AWS CDKベース、Lambda + EventBridgeの管理に最適) |
 | monorepo管理 | Turborepo |
 
 ### Lambda上でのPlaywright
@@ -71,6 +71,13 @@
 - `@sparticuz/chromium` パッケージでChromiumをLambda Layer経由で使用
 - メモリ1024MB〜に設定
 - JSレンダリングが不要なサイトはCheerioCrawlerで軽量に処理
+- サイトごとに個別のLambda関数として実行（タイムアウトリスク回避・並列実行可能）
+
+### LINE Messaging API
+
+- LINE公式アカウントのMessaging API（push message）を使用
+- ユーザーは公式アカウントを友だち追加 → LINEログインでWeb画面と連携
+- LINE Notifyは廃止予定のため使用しない
 
 ## データモデル
 
@@ -259,7 +266,7 @@ PUT    /notification-settings
 │  ├ crawler/          クローラー (Lambda用)
 │  ├ db/               Prisma schema + 型定義
 │  └ shared/           共通型・ユーティリティ
-├ infra/               SST or CDK
+├ infra/               SST
 ├ turbo.json
 └ package.json
 ```
