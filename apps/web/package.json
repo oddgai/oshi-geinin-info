@@ -1,0 +1,26 @@
+{
+  "name": "@oshi-geinin/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@oshi-geinin/db": "*",
+    "@oshi-geinin/shared": "*",
+    "next": "^15",
+    "next-auth": "^4",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16",
+    "@testing-library/jest-dom": "^6",
+    "vitest": "^3",
+    "@vitejs/plugin-react": "^4"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "oshi-geinin-info",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "turbo": "^2",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@oshi-geinin/crawler",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@oshi-geinin/db": "*",
+    "@oshi-geinin/shared": "*",
+    "crawlee": "^3",
+    "playwright": "^1",
+    "@sparticuz/chromium": "^131"
+  },
+  "devDependencies": {
+    "vitest": "^3"
+  }
+}
