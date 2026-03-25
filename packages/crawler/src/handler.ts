@@ -1,12 +1,19 @@
 import type { Scraper } from "./scrapers/base";
 import { FanyScraper } from "./scrapers/fany";
+import { YoshimotoScraper } from "./scrapers/yoshimoto";
+import { ZaikoScraper } from "./scrapers/zaiko";
+import { TigetScraper } from "./scrapers/tiget";
+import { EplusScraper } from "./scrapers/eplus";
 import { storeLives } from "./store";
 import { findUsersToNotify, sendNewLiveNotification } from "./notify";
 import { prisma } from "@oshi-geinin/db";
 
 const scrapers: Record<string, () => Scraper> = {
   fany: () => new FanyScraper(),
-  // yoshimoto, zaiko, tiget, eplus will be added later
+  yoshimoto: () => new YoshimotoScraper(),
+  zaiko: () => new ZaikoScraper(),
+  tiget: () => new TigetScraper(),
+  eplus: () => new EplusScraper(),
 };
 
 export async function handler() {
