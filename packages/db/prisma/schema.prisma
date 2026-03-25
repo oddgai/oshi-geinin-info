@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Artist {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  aliases   String[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  lives          LiveArtist[]
+  favoritedBy    UserFavoriteArtist[]
+
+  @@unique([name])
+  @@map("artists")
+}
+
+model Live {
+  id               String    @id @default(uuid()) @db.Uuid
+  title            String
+  venue            String
+  startAt          DateTime? @map("start_at")
+  endAt            DateTime? @map("end_at")
+  datetimeText     String    @map("datetime_text")
+  type             String    // "online" | "offline"
+  streamingEndAt   DateTime? @map("streaming_end_at")
+  streamingEndText String?   @map("streaming_end_text")
+  relatedLiveId    String?   @map("related_live_id") @db.Uuid
+  ticketPrice      String    @map("ticket_price")
+  ticketPriceMin   Int?      @map("ticket_price_min")
+  ticketStatus     String    @map("ticket_status")
+  ticketUrl        String    @map("ticket_url")
+  sourceSite       String    @map("source_site")
+  sourceUrl        String    @unique @map("source_url")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  relatedLive   Live?          @relation("RelatedLives", fields: [relatedLiveId], references: [id])
+  relatedFrom   Live[]         @relation("RelatedLives")
+  artists       LiveArtist[]
+  notifications Notification[]
+
+  @@map("lives")
+}
+
+model LiveArtist {
+  liveId   String @map("live_id") @db.Uuid
+  artistId String @map("artist_id") @db.Uuid
+
+  live   Live   @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([liveId, artistId])
+  @@map("live_artists")
+}
+
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  lineUserId String   @unique @map("line_user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  favorites     UserFavoriteArtist[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model UserFavoriteArtist {
+  userId   String @map("user_id") @db.Uuid
+  artistId String @map("artist_id") @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([userId, artistId])
+  @@map("user_favorite_artists")
+}
+
+model Notification {
+  id     String   @id @default(uuid()) @db.Uuid
+  userId String   @map("user_id") @db.Uuid
+  liveId String   @map("live_id") @db.Uuid
+  type   String   // "new_live" | "streaming_end_reminder"
+  sentAt DateTime @default(now()) @map("sent_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
