@@ -1,0 +1,34 @@
+# pre-commit でコミット前にチェックする。
+#   uvx pre-commit install   # 初回のみ（フック登録）
+#   uvx pre-commit run --all-files  # 全ファイルに対して手動実行
+# rev はコミットハッシュで固定（# frozen でタグを併記）。
+# 更新は `make update-hooks`（uvx pre-commit autoupdate --freeze）で行う。
+# ※ Dependabot は pre-commit を対象外のため、フックの更新は手動。
+default_stages: [pre-commit]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        # markdown の hard linebreak は保持する
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      # 大きすぎるファイルのコミットを禁止する
+      - id: check-added-large-files
+      # 改行コードの混在をチェック（修正はしない）
+      - id: mixed-line-ending
+        args: [--fix=no]
+
+  # ruff（lint + format）。設定は ruff.toml を自動参照する
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 745be0411e3c150e246d527e531e5a221b8c3462 # frozen: v0.15.19
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  # クレデンシャルのハードコードを検出する（https://gitleaks.io/）
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e # frozen: v8.30.1
+    hooks:
+      - id: gitleaks

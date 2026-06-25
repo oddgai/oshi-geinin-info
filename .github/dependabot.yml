@@ -1,0 +1,49 @@
+version: 2
+updates:
+  # GitHub Actions（.github/workflows を走査）。SHA 固定はそのまま SHA を更新する
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types:
+          - minor
+          - patch
+
+  # backend（uv）
+  - package-ecosystem: uv
+    directory: /backend
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    cooldown:
+      default-days: 7
+    groups:
+      backend:
+        patterns: ["*"]
+        update-types:
+          - minor
+          - patch
+
+  # frontend（uv）
+  - package-ecosystem: uv
+    directory: /frontend
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    cooldown:
+      default-days: 7
+    groups:
+      frontend:
+        patterns: ["*"]
+        update-types:
+          - minor
+          - patch

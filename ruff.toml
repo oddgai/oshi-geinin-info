@@ -1,0 +1,12 @@
+# ルート共通の ruff 設定（backend / frontend をまとめて対象にする）
+# line-length は ruff デフォルト（88）を使う
+target-version = "py312"
+
+[lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: flake8-bugbear
+select = ["E", "W", "F", "I", "UP", "B"]
+ignore = []
+
+[format]
+quote-style = "double"
+indent-style = "space"
