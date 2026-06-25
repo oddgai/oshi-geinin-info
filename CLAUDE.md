@@ -17,6 +17,7 @@
 - `uv.lock` は必ずコミットする
 - 秘匿情報（トークン・認証情報）をコード/コミットに含めない。環境変数で渡す
 - 環境変数のハードコードを避ける
+- GitHub Actions はバージョンタグではなくコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。アクション追加・更新後は `make pin` で固定し、`make pin-check` で検証する。CI の `pinact` ジョブでも検証される
 
 ## ブランチ戦略
 

@@ -56,6 +56,18 @@ make fmt        # ruff format + check --fix（コミット前に実行）
 make check      # lint + format チェック（PR 前のゲート・書き換えなし）
 ```
 
+## GitHub Actions の固定（pinact）
+
+Actions はサプライチェーン対策としてコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。
+
+```bash
+brew install suzuki-shunsuke/pinact/pinact  # 初回のみ
+make pin        # .github/workflows/* のアクションをハッシュに固定
+make pin-check  # 固定済みか検証（CI の pinact ジョブと同等）
+```
+
+`make pin` は GitHub API を叩くため、レート制限に当たる場合は `GITHUB_TOKEN=$(gh auth token) make pin` のようにトークンを渡す。
+
 ## PR を出すとき
 
 `/pr-create` コマンドを使う（内部で `make check` を通し、`main` へ向けて PR を作成する）。

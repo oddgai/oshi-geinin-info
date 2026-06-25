@@ -24,6 +24,14 @@ fmt: ## ruff で自動整形（コミット前に実行）
 fmt-check: ## 整形済みかチェック（CI 相当・書き換えなし）
 	$(RUFF) format --check .
 
+.PHONY: pin
+pin: ## GitHub Actions をコミットハッシュに固定（pinact）
+	pinact run
+
+.PHONY: pin-check
+pin-check: ## Actions が固定済みか検証（書き換えなし・CI 相当）
+	pinact run --check --verify
+
 .PHONY: up
 up: ## docker compose で起動
 	docker compose up
