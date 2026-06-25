@@ -18,6 +18,21 @@
 - 秘匿情報（トークン・認証情報）をコード/コミットに含めない。環境変数で渡す
 - 環境変数のハードコードを避ける
 - GitHub Actions はバージョンタグではなくコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。アクション追加・更新後は `make pin` で固定し、`make pin-check` で検証する。CI の `pinact` ジョブでも検証される
+- コミット前に pre-commit を通す（`make hooks` で登録 / `make pre-commit` で全実行）。gitleaks・ruff・ファイル衛生をローカルで前倒しチェックする
+- 依存と Actions の更新は Renovate に任せる（`renovate.json`）。minor/patch/digest は automerge
+
+## CI / セキュリティ
+
+CI（`.github/workflows/ci.yml`）は以下のジョブで構成する。いずれも `permissions` を最小化し、checkout は `persist-credentials: false` にする。
+
+- `lint` … `make check`（ruff）
+- `build` … `docker compose build`
+- `gitleaks` … 秘匿情報スキャン
+- `pinact` … Actions がハッシュ固定されているか検証
+- `actionlint` … ワークフロー YAML の静的検査
+- `zizmor` … Actions のセキュリティスキャン（インジェクション・過剰権限等）
+
+新しいワークフローやアクションを追加したら、ローカルで `uvx zizmor@<version> .github/` と `actionlint` を流して確認する。
 
 ## ブランチ戦略
 

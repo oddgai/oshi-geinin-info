@@ -56,6 +56,31 @@ make fmt        # ruff format + check --fix（コミット前に実行）
 make check      # lint + format チェック（PR 前のゲート・書き換えなし）
 ```
 
+## pre-commit
+
+コミット前に gitleaks・ruff・ファイル衛生（末尾空白 / EOF / 巨大ファイル禁止 / 改行コード）を実行する。
+
+```bash
+make hooks       # フックを登録（初回のみ。内部は uvx pre-commit install）
+make pre-commit  # 全ファイルに対して手動実行
+```
+
+設定は `.pre-commit-config.yaml`。`rev` はコミットハッシュ固定で、更新は Renovate が PR を出す。
+
+## GitHub Actions のセキュリティ検査
+
+ワークフローを追加・変更したら、push 前にローカルで検査できる（CI の `actionlint` / `zizmor` ジョブと同等）。
+
+```bash
+uvx zizmor@1.26.1 .github/   # セキュリティスキャン（GH_TOKEN を渡すと精度向上）
+actionlint                   # YAML 静的検査（brew install actionlint）
+```
+
+## 依存・Actions の更新（Renovate）
+
+`renovate.json` で GitHub Actions と pre-commit フックの更新 PR を自動生成する（minor/patch/digest は automerge）。
+有効化には対象リポジトリに [Mend Renovate](https://github.com/apps/renovate) アプリのインストールが必要。
+
 ## GitHub Actions の固定（pinact）
 
 Actions はサプライチェーン対策としてコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。

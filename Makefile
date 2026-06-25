@@ -24,6 +24,14 @@ fmt: ## ruff で自動整形（コミット前に実行）
 fmt-check: ## 整形済みかチェック（CI 相当・書き換えなし）
 	$(RUFF) format --check .
 
+.PHONY: hooks
+hooks: ## pre-commit フックを登録（初回のみ）
+	uvx pre-commit install
+
+.PHONY: pre-commit
+pre-commit: ## pre-commit を全ファイルに実行
+	uvx pre-commit run --all-files
+
 .PHONY: pin
 pin: ## GitHub Actions をコミットハッシュに固定（pinact）
 	pinact run
