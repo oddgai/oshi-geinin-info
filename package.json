@@ -1,6 +1,7 @@
 {
   "name": "oshi-geinin-info",
   "private": true,
+  "packageManager": "npm@11.16.0",
   "workspaces": [
     "apps/*",
     "packages/*"
