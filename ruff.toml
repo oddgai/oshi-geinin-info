@@ -1,6 +1,6 @@
 # ルート共通の ruff 設定（backend / frontend をまとめて対象にする）
+# line-length は ruff デフォルト（88）を使う
 target-version = "py312"
-line-length = 100
 
 [lint]
 # E/W: pycodestyle, F: pyflakes, I: isort, UP: pyupgrade, B: flake8-bugbear
