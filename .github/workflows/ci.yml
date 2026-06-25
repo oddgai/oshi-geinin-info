@@ -43,4 +43,5 @@ jobs:
       - name: Verify actions are pinned
         uses: suzuki-shunsuke/pinact-action@28aeb220eb3252ad0d4422dd5d9368e925acbd8d # v1.3.0
         with:
-          fix: "false"
+          skip_push: "true" # push せず検証のみ。未固定なら CI を fail させる
+          verify: "true" # バージョンコメントと SHA の整合も検証する
