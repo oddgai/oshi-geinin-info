@@ -104,3 +104,38 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: uvx zizmor@1.26.1 .github/
+
+  # 集約チェック（種類ごと）。Ruleset の必須チェックはこの 2 つだけにする。
+  # 個別ジョブを増減してもこの gate が束ねるため Ruleset 側の変更は不要。
+  ci:
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    if: ${{ always() }}
+    steps:
+      - name: Verify app jobs passed
+        env:
+          LINT: ${{ needs.lint.result }}
+          BUILD: ${{ needs.build.result }}
+        run: |
+          echo "lint=$LINT build=$BUILD"
+          [ "$LINT" = success ] && [ "$BUILD" = success ]
+
+  security:
+    needs: [gitleaks, pinact, actionlint, zizmor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    if: ${{ always() }}
+    steps:
+      - name: Verify security jobs passed
+        env:
+          GITLEAKS: ${{ needs.gitleaks.result }}
+          PINACT: ${{ needs.pinact.result }}
+          ACTIONLINT: ${{ needs.actionlint.result }}
+          ZIZMOR: ${{ needs.zizmor.result }}
+        run: |
+          echo "gitleaks=$GITLEAKS pinact=$PINACT actionlint=$ACTIONLINT zizmor=$ZIZMOR"
+          [ "$GITLEAKS" = success ] && [ "$PINACT" = success ] \
+            && [ "$ACTIONLINT" = success ] && [ "$ZIZMOR" = success ]
