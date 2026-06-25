@@ -19,7 +19,7 @@
 - 環境変数のハードコードを避ける
 - GitHub Actions はバージョンタグではなくコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。アクション追加・更新後は `make pin` で固定し、`make pin-check` で検証する。CI の `pinact` ジョブでも検証される
 - コミット前に pre-commit を通す（`make hooks` で登録 / `make pre-commit` で全実行）。gitleaks・ruff・ファイル衛生をローカルで前倒しチェックする
-- 依存と Actions の更新は Renovate に任せる（`renovate.json`）。minor/patch/digest は automerge
+- 依存（uv）と GitHub Actions の更新は Dependabot に任せる（`.github/dependabot.yml`、weekly）。pre-commit フックは対象外なので `make update-hooks` で更新する
 
 ## CI / セキュリティ
 

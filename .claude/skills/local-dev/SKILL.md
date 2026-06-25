@@ -65,7 +65,7 @@ make hooks       # フックを登録（初回のみ。内部は uvx pre-commit 
 make pre-commit  # 全ファイルに対して手動実行
 ```
 
-設定は `.pre-commit-config.yaml`。`rev` はコミットハッシュ固定で、更新は Renovate が PR を出す。
+設定は `.pre-commit-config.yaml`。`rev` はコミットハッシュ固定。フックの更新は `make update-hooks`（`pre-commit autoupdate --freeze`）で行う（Dependabot は pre-commit 対象外）。
 
 ## GitHub Actions のセキュリティ検査
 
@@ -76,10 +76,10 @@ uvx zizmor@1.26.1 .github/   # セキュリティスキャン（GH_TOKEN を渡�
 actionlint                   # YAML 静的検査（brew install actionlint）
 ```
 
-## 依存・Actions の更新（Renovate）
+## 依存・Actions の更新（Dependabot）
 
-`renovate.json` で GitHub Actions と pre-commit フックの更新 PR を自動生成する（minor/patch/digest は automerge）。
-有効化には対象リポジトリに [Mend Renovate](https://github.com/apps/renovate) アプリのインストールが必要。
+`.github/dependabot.yml` で GitHub Actions と uv 依存（backend / frontend）の更新 PR を weekly で自動生成する。
+GitHub 純正なのでアプリのインストールは不要。pre-commit フックは Dependabot の対象外なので `make update-hooks` で更新する。
 
 ## GitHub Actions の固定（pinact）
 

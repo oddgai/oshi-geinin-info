@@ -9,6 +9,7 @@
       "Bash(make pin-check)",
       "Bash(make hooks)",
       "Bash(make pre-commit)",
+      "Bash(make update-hooks)",
       "Bash(make up)",
       "Bash(make help)",
       "Bash(uvx ruff:*)",

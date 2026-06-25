@@ -32,6 +32,10 @@ hooks: ## pre-commit フックを登録（初回のみ）
 pre-commit: ## pre-commit を全ファイルに実行
 	uvx pre-commit run --all-files
 
+.PHONY: update-hooks
+update-hooks: ## pre-commit フックの rev を更新（ハッシュ固定を維持）
+	uvx pre-commit autoupdate --freeze
+
 .PHONY: pin
 pin: ## GitHub Actions をコミットハッシュに固定（pinact）
 	pinact run
