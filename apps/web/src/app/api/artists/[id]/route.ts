@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@oshi-geinin/db";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   const artist = await prisma.artist.findUnique({

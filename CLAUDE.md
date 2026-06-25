@@ -1,8 +1,14 @@
 # プロジェクトルール（oshi-geinin-info）
 
-推し芸人info。FastAPI backend + Streamlit frontend を docker compose で動かす Web アプリ。
+推し芸人ライブ通知アプリ。お笑いチケットサイトをクロールし、お気に入り芸人の新着ライブを LINE で通知する Web アプリ。
 
-> **将来方針**: システム構成は将来 TypeScript ベースへ移行予定。コマンドや本ルールは `make check` などのタスク抽象を介しているため、移行時は `Makefile` と各サブプロジェクトを差し替えれば対応できる。
+Turborepo monorepo（pnpm）で構成する。
+
+- `apps/web` … Next.js（App Router）フロント + API ルート
+- `packages/crawler` … Crawlee / cheerio クローラー（AWS Lambda）
+- `packages/db` … Prisma スキーマ + PrismaClient
+- `packages/shared` … 共通ユーティリティ
+- `infra` … SST（AWS Lambda + EventBridge）
 
 ## 重要: ルールの優先順位
 
@@ -10,23 +16,26 @@
 
 ## コード品質
 
-- パッケージ管理は各サブプロジェクトで `uv` を使う（`backend/`, `frontend/`）
-- タスク完了時はルートで `make check` を実行し、通してからコミットする
-- コミット前に `make fmt` で整形する（CI 相当の `make check` は書き換えなしのチェック）
-- lint を `# noqa` の濫用や ruff ルールの無効化で握りつぶさない。根本を直す
-- `uv.lock` は必ずコミットする
+- パッケージ管理は `pnpm`（workspace）。タスク実行は `turbo` 経由
+- タスク完了時はルートで `make check`（= `lint` + `fmt-check` + `knip`）を通してからコミットする
+- コミット前に `make fmt` で整形する（oxfmt + oxlint --fix）。CI 相当の `make check` は書き換えなしのチェック
+- lint（oxlint）をルール無効化や安易な disable コメントで握りつぶさない。根本を直す
+- 未使用のファイル / 依存 / export は `knip` で検出し放置しない。実行時のみ必要な依存は `knip.json` の `ignoreDependencies` に理由付きで登録する
+- `pnpm-lock.yaml` は必ずコミットする
 - 秘匿情報（トークン・認証情報）をコード/コミットに含めない。環境変数で渡す
 - 環境変数のハードコードを避ける
+- ツールのバージョンは `package.json` の devDependencies で固定する（oxlint / oxfmt / knip）
 - GitHub Actions はバージョンタグではなくコミットハッシュで固定する（[pinact](https://github.com/suzuki-shunsuke/pinact)）。アクション追加・更新後は `make pin` で固定し、`make pin-check` で検証する。CI の `pinact` ジョブでも検証される
-- コミット前に pre-commit を通す（`make hooks` で登録 / `make pre-commit` で全実行）。gitleaks・ruff・ファイル衛生をローカルで前倒しチェックする
-- 依存（uv）と GitHub Actions の更新は Dependabot に任せる（`.github/dependabot.yml`、weekly）。pre-commit フックは対象外なので `make update-hooks` で更新する
+- コミット前に pre-commit を通す（`make hooks` で登録 / `make pre-commit` で全実行）。gitleaks・oxlint/oxfmt・ファイル衛生をローカルで前倒しチェックする
+- 依存（npm）と GitHub Actions の更新は Dependabot に任せる（`.github/dependabot.yml`、weekly）。pre-commit フックは対象外なので `make update-hooks` で更新する
 
 ## CI / セキュリティ
 
-CI（`.github/workflows/ci.yml`）は以下のジョブで構成する。いずれも `permissions` を最小化し、checkout は `persist-credentials: false` にする。
+CI（`.github/workflows/ci.yml`）は以下のジョブで構成する。いずれも `permissions` を最小化し、checkout は `persist-credentials: false` にする。必須チェックは集約 gate（`ci` / `security`）のみで、個別ジョブはどちらかの `needs` に必ず加える。
 
-- `lint` … `make check`（ruff）
-- `build` … `docker compose build`
+- `lint` … `make check`（oxlint + oxfmt + knip）
+- `build` … `pnpm build`（turbo）
+- `test` … `pnpm test`（turbo / vitest）
 - `gitleaks` … 秘匿情報スキャン
 - `pinact` … Actions がハッシュ固定されているか検証
 - `actionlint` … ワークフロー YAML の静的検査
@@ -49,14 +58,17 @@ CI（`.github/workflows/ci.yml`）は以下のジョブで構成する。いず�
 - レビュー: `/pr-review`（変更内容・CI・品質を確認）
 - PR がある場合は GitHub Actions が通るところまで確認する
 
-## ディレクトリ構成
+## 開発タスク
 
-- `backend/` … FastAPI（uv / Python 3.12）。ポート `8000`
-- `frontend/` … Streamlit（uv / Python 3.12）。ポート `8501`。`BACKEND_HOST` 経由で backend を呼ぶ
-- `docker-compose.yml` … 両サービスを接続
-- `Makefile` … 開発タスクのエントリポイント（`make help` で一覧）
+`Makefile` が開発タスクのエントリポイント（`make help` で一覧）。
 
-ローカル開発の詳細手順は `.claude/skills/local-dev/SKILL.md` を参照。
+- `make install` … 依存インストール（`pnpm install`）
+- `make dev` … 開発サーバ起動（`turbo dev`）
+- `make build` / `make test` … ビルド / テスト（turbo）
+- `make check` … PR 前ゲート（lint + fmt-check + knip）
+- `make fmt` … 整形（oxfmt + oxlint --fix）
+
+DB は Prisma。スキーマ変更後は `pnpm --filter @oshi-geinin/db db:generate`、Supabase へは `db:push`。ローカル開発の詳細は `.claude/skills/local-dev/SKILL.md` を参照。
 
 ## 全般
 

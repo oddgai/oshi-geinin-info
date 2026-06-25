@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "sst": "^2",
     "aws-cdk-lib": "^2",
-    "constructs": "^10"
+    "constructs": "^10",
+    "sst": "^2"
   }
 }

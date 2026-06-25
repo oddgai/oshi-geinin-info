@@ -29,15 +29,11 @@ export default async function TopPage() {
   if (!session) {
     return (
       <div className="text-center py-16">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          推し芸人ライブ情報
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">推し芸人ライブ情報</h1>
         <p className="text-gray-600 mb-2">
           お気に入りの芸人のライブ情報をまとめてチェックできます。
         </p>
-        <p className="text-gray-600 mb-8">
-          ライブの開始前にLINE通知でお知らせします。
-        </p>
+        <p className="text-gray-600 mb-8">ライブの開始前にLINE通知でお知らせします。</p>
         <Link
           href="/api/auth/signin"
           className="inline-block bg-green-500 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-green-600 transition-colors"
@@ -71,9 +67,7 @@ export default async function TopPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">
-          お気に入りのライブ
-        </h1>
+        <h1 className="text-xl font-bold text-gray-900">お気に入りのライブ</h1>
         <Link
           href="/artists"
           className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
@@ -95,9 +89,7 @@ export default async function TopPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {lives.map((live: any) => {
-            const performers = live.artists?.map(
-              (a: any) => a.artist?.name
-            ).filter(Boolean);
+            const performers = live.artists?.map((a: any) => a.artist?.name).filter(Boolean);
             return (
               <LiveCard
                 key={live.id}

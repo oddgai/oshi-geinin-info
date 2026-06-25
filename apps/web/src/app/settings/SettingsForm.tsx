@@ -8,11 +8,7 @@ type Settings = {
   reminderHoursBefore: number;
 };
 
-export function SettingsForm({
-  initialSettings,
-}: {
-  initialSettings: Settings;
-}) {
+export function SettingsForm({ initialSettings }: { initialSettings: Settings }) {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -35,9 +31,7 @@ export function SettingsForm({
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-900 mb-4">
-        通知設定
-      </h2>
+      <h2 className="text-base font-semibold text-gray-900 mb-4">通知設定</h2>
 
       <div className="space-y-4">
         <label className="flex items-center justify-between gap-4 cursor-pointer">
@@ -69,9 +63,7 @@ export function SettingsForm({
         <label className="flex items-center justify-between gap-4 cursor-pointer">
           <div>
             <p className="text-sm font-medium text-gray-900">配信終了リマインダー</p>
-            <p className="text-xs text-gray-500">
-              アーカイブ配信終了前に通知
-            </p>
+            <p className="text-xs text-gray-500">アーカイブ配信終了前に通知</p>
           </div>
           <button
             onClick={() =>
@@ -86,9 +78,7 @@ export function SettingsForm({
           >
             <span
               className={`inline-block h-5 w-5 mt-0.5 ml-0.5 rounded-full bg-white shadow transition-transform ${
-                settings.streamingEndReminder
-                  ? "translate-x-5"
-                  : "translate-x-0"
+                settings.streamingEndReminder ? "translate-x-5" : "translate-x-0"
               }`}
             />
           </button>
@@ -124,9 +114,7 @@ export function SettingsForm({
         >
           {saving ? "保存中..." : "保存する"}
         </button>
-        {saved && (
-          <span className="text-sm text-green-600">保存しました</span>
-        )}
+        {saved && <span className="text-sm text-green-600">保存しました</span>}
       </div>
     </div>
   );

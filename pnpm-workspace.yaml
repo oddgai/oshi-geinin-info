@@ -1,0 +1,15 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "infra"
+
+# postinstall スクリプトの実行を許可する依存。必要なものだけ true にする。
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+  esbuild: true
+  sharp: true
+  # ネイティブ optional 依存。なくてもフォールバックするため false。
+  aws-crt: false
+  aws-sdk: false

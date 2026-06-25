@@ -21,9 +21,7 @@ export function ArtistCard({ artist, isFavorited = false }: ArtistCardProps) {
           </h3>
         </Link>
         {artist.aliases && artist.aliases.length > 0 && (
-          <p className="text-sm text-gray-500 truncate mt-0.5">
-            別名: {artist.aliases.join("、")}
-          </p>
+          <p className="text-sm text-gray-500 truncate mt-0.5">別名: {artist.aliases.join("、")}</p>
         )}
       </div>
       <FavoriteButton artistId={artist.id} initialFavorited={isFavorited} />

@@ -7,9 +7,7 @@ export async function GET(request: Request) {
   const page = Number(searchParams.get("page") ?? "1");
   const limit = Number(searchParams.get("limit") ?? "20");
 
-  const where = q
-    ? { OR: [{ name: { contains: q } }, { aliases: { has: q } }] }
-    : {};
+  const where = q ? { OR: [{ name: { contains: q } }, { aliases: { has: q } }] } : {};
 
   const [artists, total] = await Promise.all([
     prisma.artist.findMany({

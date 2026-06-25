@@ -69,7 +69,7 @@ describe("GET /api/lives", () => {
     expect(mockPrisma.live.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({ type: "online" }),
-      })
+      }),
     );
   });
 
@@ -85,7 +85,7 @@ describe("GET /api/lives", () => {
         where: expect.objectContaining({
           artists: { some: { artistId: "artist-1" } },
         }),
-      })
+      }),
     );
   });
 
@@ -94,7 +94,7 @@ describe("GET /api/lives", () => {
     mockPrisma.live.count.mockResolvedValue(0);
 
     const request = makeRequest(
-      "http://localhost:3000/api/lives?dateFrom=2026-04-01&dateTo=2026-04-30"
+      "http://localhost:3000/api/lives?dateFrom=2026-04-01&dateTo=2026-04-30",
     );
     await getLives(request);
 
@@ -106,7 +106,7 @@ describe("GET /api/lives", () => {
             lte: new Date("2026-04-30"),
           },
         }),
-      })
+      }),
     );
   });
 
@@ -121,7 +121,7 @@ describe("GET /api/lives", () => {
     expect(data.page).toBe(2);
     expect(data.limit).toBe(5);
     expect(mockPrisma.live.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: 5, take: 5 })
+      expect.objectContaining({ skip: 5, take: 5 }),
     );
   });
 });
@@ -157,7 +157,7 @@ describe("GET /api/lives/[id]", () => {
     expect(response.status).toBe(200);
     expect(data.live).toEqual(mockLive);
     expect(mockPrisma.live.findUnique).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "live-1" } })
+      expect.objectContaining({ where: { id: "live-1" } }),
     );
   });
 

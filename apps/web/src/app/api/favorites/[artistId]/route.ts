@@ -10,7 +10,7 @@ async function getAuthenticatedUserId(): Promise<string | null> {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ artistId: string }> }
+  { params }: { params: Promise<{ artistId: string }> },
 ) {
   const userId = await getAuthenticatedUserId();
   if (!userId) {

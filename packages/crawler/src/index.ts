@@ -1,2 +1,0 @@
-// Crawler entry point
-export {};

@@ -64,9 +64,7 @@ beforeEach(() => {
 
 describe("findUsersToNotify", () => {
   it("returns users who favorited artists linked to the live", async () => {
-    mockPrismaLiveArtist.findMany.mockResolvedValue([
-      { artistId: "artist-uuid-1" },
-    ]);
+    mockPrismaLiveArtist.findMany.mockResolvedValue([{ artistId: "artist-uuid-1" }]);
     mockPrismaNotification.findMany.mockResolvedValue([]);
     mockPrismaUserFavoriteArtist.findMany.mockResolvedValue([
       { userId: sampleUser.id, artistId: "artist-uuid-1", user: sampleUser },
@@ -93,12 +91,8 @@ describe("findUsersToNotify", () => {
       createdAt: new Date(),
     };
 
-    mockPrismaLiveArtist.findMany.mockResolvedValue([
-      { artistId: "artist-uuid-1" },
-    ]);
-    mockPrismaNotification.findMany.mockResolvedValue([
-      { userId: alreadyNotifiedUser.id },
-    ]);
+    mockPrismaLiveArtist.findMany.mockResolvedValue([{ artistId: "artist-uuid-1" }]);
+    mockPrismaNotification.findMany.mockResolvedValue([{ userId: alreadyNotifiedUser.id }]);
     mockPrismaUserFavoriteArtist.findMany.mockResolvedValue([
       {
         userId: sampleUser.id,
@@ -230,9 +224,7 @@ describe("sendNewLiveNotification", () => {
 
     await sendNewLiveNotification(sampleUser, sampleLive);
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("LINE push failed: 400")
-    );
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("LINE push failed: 400"));
 
     errorSpy.mockRestore();
   });

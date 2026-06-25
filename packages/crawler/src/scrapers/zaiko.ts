@@ -31,11 +31,13 @@ export class ZaikoScraper implements Scraper {
       requestHandlerTimeoutSecs: 60,
       async requestHandler({ page, request, enqueueLinks }) {
         // Wait for event cards to render
-        await page.waitForSelector("a[href*='/event/']", {
-          timeout: 15_000,
-        }).catch(() => {
-          // No events found on this page
-        });
+        await page
+          .waitForSelector("a[href*='/event/']", {
+            timeout: 15_000,
+          })
+          .catch(() => {
+            // No events found on this page
+          });
 
         const events = await page.$$eval(
           "a[href*='/event/']",
@@ -48,9 +50,7 @@ export class ZaikoScraper implements Scraper {
               })
               .map((a) => {
                 const href = a.getAttribute("href") ?? "";
-                const fullUrl = href.startsWith("http")
-                  ? href
-                  : `${baseUrl}${href}`;
+                const fullUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
 
                 // Extract text content from the event card
                 const textParts = (a.textContent ?? "")
@@ -64,7 +64,7 @@ export class ZaikoScraper implements Scraper {
                 };
               });
           },
-          BASE_URL
+          BASE_URL,
         );
 
         for (const event of events) {
@@ -97,10 +97,7 @@ export class ZaikoScraper implements Scraper {
  * Parse event information from a zaiko event card's text content.
  * The card typically shows: title, date, venue in separate text nodes.
  */
-export function parseZaikoEventCard(
-  texts: string[],
-  url: string
-): LiveData | null {
+export function parseZaikoEventCard(texts: string[], url: string): LiveData | null {
   if (texts.length === 0) return null;
 
   const title = texts[0] ?? "";
@@ -136,22 +133,14 @@ export function parseZaikoEventCard(
  */
 export function parseZaikoDatetime(text: string): Date | null {
   // Try YYYY/MM/DD HH:MM or YYYY-MM-DD HH:MM
-  const slashMatch = text.match(
-    /(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})\s+(\d{1,2}):(\d{2})/
-  );
+  const slashMatch = text.match(/(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})\s+(\d{1,2}):(\d{2})/);
   if (slashMatch) {
     const [, year, month, day, hour, minute] = slashMatch;
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }
 
   // Try YYYY/MM/DD without time
-  const dateOnly = text.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+  const dateOnly = text.match(/(\d{4})[/\-.](\d{1,2})[/\-.](\d{1,2})/);
   if (dateOnly) {
     const [, year, month, day] = dateOnly;
     return new Date(Number(year), Number(month) - 1, Number(day));
@@ -163,10 +152,7 @@ export function parseZaikoDatetime(text: string): Date | null {
 /** Find the text line that looks like a date. */
 function findDateText(texts: string[]): string | undefined {
   return texts.find(
-    (t) =>
-      /\d{4}[\/\-.]/.test(t) ||
-      /\d{1,2}月\d{1,2}日/.test(t) ||
-      /\d{4}年/.test(t)
+    (t) => /\d{4}[/\-.]/.test(t) || /\d{1,2}月\d{1,2}日/.test(t) || /\d{4}年/.test(t),
   );
 }
 
@@ -175,8 +161,7 @@ function findVenueText(texts: string[]): string | undefined {
   // Venues in Japanese often contain 会場, 劇場, ホール, etc.
   return texts.find(
     (t) =>
-      /会場|劇場|ホール|シアター|ライブハウス|LIVE|HALL|THEATER/i.test(t) &&
-      !/\d{4}[\/\-.]/.test(t) // Exclude date lines
+      /会場|劇場|ホール|シアター|ライブハウス|LIVE|HALL|THEATER/i.test(t) && !/\d{4}[/\-.]/.test(t), // Exclude date lines
   );
 }
 
@@ -187,9 +172,8 @@ function findPriceText(texts: string[]): string | undefined {
 
 /** Find ticket status text. */
 function findStatusText(texts: string[]): string | undefined {
-  return texts.find(
-    (t) =>
-      /発売中|受付中|SOLD\s*OUT|完売|販売終了|受付終了|販売前|受付前/i.test(t)
+  return texts.find((t) =>
+    /発売中|受付中|SOLD\s*OUT|完売|販売終了|受付終了|販売前|受付前/i.test(t),
   );
 }
 

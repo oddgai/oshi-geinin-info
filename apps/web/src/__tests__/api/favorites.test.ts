@@ -62,7 +62,7 @@ describe("GET /api/favorites", () => {
     expect(response.status).toBe(200);
     expect(data.favorites).toEqual(mockFavorites);
     expect(mockPrisma.userFavoriteArtist.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user-1" } })
+      expect.objectContaining({ where: { userId: "user-1" } }),
     );
   });
 });
@@ -111,7 +111,7 @@ describe("POST /api/favorites", () => {
       expect.objectContaining({
         where: { userId_artistId: { userId: "user-1", artistId: "artist-1" } },
         create: { userId: "user-1", artistId: "artist-1" },
-      })
+      }),
     );
   });
 

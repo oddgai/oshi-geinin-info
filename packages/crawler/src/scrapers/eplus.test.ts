@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  EplusScraper,
-  parseEplusListPage,
-  parseEplusDatetime,
-} from "./eplus";
+import { EplusScraper, parseEplusListPage, parseEplusDatetime } from "./eplus";
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -173,27 +169,21 @@ describe("parseEplusListPage", () => {
 
 describe("parseEplusDatetime", () => {
   it("parses date with 開演 time", () => {
-    expect(
-      parseEplusDatetime("2026/4/1(水) 開演：19:00～（開場：18:30～）")
-    ).toEqual(new Date(2026, 3, 1, 19, 0));
+    expect(parseEplusDatetime("2026/4/1(水) 開演：19:00～（開場：18:30～）")).toEqual(
+      new Date(2026, 3, 1, 19, 0),
+    );
   });
 
   it("parses date without time", () => {
-    expect(parseEplusDatetime("2026/4/1(水)")).toEqual(
-      new Date(2026, 3, 1)
-    );
+    expect(parseEplusDatetime("2026/4/1(水)")).toEqual(new Date(2026, 3, 1));
   });
 
   it("parses holiday date", () => {
-    expect(parseEplusDatetime("2026/3/20(金・祝)")).toEqual(
-      new Date(2026, 2, 20)
-    );
+    expect(parseEplusDatetime("2026/3/20(金・祝)")).toEqual(new Date(2026, 2, 20));
   });
 
   it("parses date with simple time", () => {
-    expect(parseEplusDatetime("2026/12/25(木) 19:30～")).toEqual(
-      new Date(2026, 11, 25, 19, 30)
-    );
+    expect(parseEplusDatetime("2026/12/25(木) 19:30～")).toEqual(new Date(2026, 11, 25, 19, 30));
   });
 
   it("returns null for unparseable text", () => {
@@ -227,7 +217,7 @@ function buildMockListPage(events: MockEvent[]): string {
       ${e.status}
       ${e.streaming ? "Streaming+" : ""}
     </a>
-  `
+  `,
     )
     .join("\n");
 

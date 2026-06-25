@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import { parseMinPrice } from "@oshi-geinin/shared";
 import type { Scraper } from "./base";
 import type { LiveData } from "../types";
 
@@ -47,9 +46,7 @@ export class EplusScraper implements Scraper {
       const res = await fetch(url);
       if (!res.ok) {
         if (res.status === 404) break;
-        throw new Error(
-          `Failed to fetch ${url}: ${res.status} ${res.statusText}`
-        );
+        throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
       }
       const html = await res.text();
       const events = parseEplusListPage(html);
@@ -62,9 +59,7 @@ export class EplusScraper implements Scraper {
 
   /** Convert a list event to LiveData. */
   toLiveData(e: EplusListEvent): LiveData {
-    const fullDatetime = e.timeText
-      ? `${e.dateText} ${e.timeText}`
-      : e.dateText;
+    const fullDatetime = e.timeText ? `${e.dateText} ${e.timeText}` : e.dateText;
     const startAt = parseEplusDatetime(fullDatetime);
 
     return {
@@ -112,9 +107,7 @@ export function parseEplusListPage(html: string): EplusListEvent[] {
     const href = $el.attr("href") ?? "";
     if (!href.includes("/sf/detail/")) return;
 
-    const detailUrl = href.startsWith("http")
-      ? href
-      : `${BASE_URL}${href}`;
+    const detailUrl = href.startsWith("http") ? href : `${BASE_URL}${href}`;
 
     // Deduplicate by URL
     if (seen.has(detailUrl)) return;
@@ -153,18 +146,10 @@ export function parseEplusDatetime(text: string): Date | null {
   const [, year, month, day] = dateMatch;
 
   // Extract time: look for 開演：HH:MM or just HH:MM
-  const timeMatch = text.match(
-    /(?:開演[：:]?\s*)?(\d{1,2}):(\d{2})(?:～|〜)?/
-  );
+  const timeMatch = text.match(/(?:開演[：:]?\s*)?(\d{1,2}):(\d{2})(?:～|〜)?/);
   if (timeMatch) {
     const [, hour, minute] = timeMatch;
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }
 
   return new Date(Number(year), Number(month) - 1, Number(day));
@@ -206,9 +191,7 @@ function parseEplusEventLines(lines: string[]): ParsedEventLines {
     }
 
     // Status: specific known patterns
-    if (
-      /^(受付中|予定枚数終了|販売中|販売終了|受付終了)$/.test(line.trim())
-    ) {
+    if (/^(受付中|予定枚数終了|販売中|販売終了|受付終了)$/.test(line.trim())) {
       status = line.trim();
       continue;
     }

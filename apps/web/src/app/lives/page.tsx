@@ -47,9 +47,7 @@ export default async function LivesPage({
         </Suspense>
       </div>
 
-      <p className="text-sm text-gray-500 mb-4">
-        {total}件のライブ
-      </p>
+      <p className="text-sm text-gray-500 mb-4">{total}件のライブ</p>
 
       {lives.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
@@ -59,9 +57,7 @@ export default async function LivesPage({
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {lives.map((live: any) => {
-              const performers = live.artists
-                ?.map((a: any) => a.artist?.name)
-                .filter(Boolean);
+              const performers = live.artists?.map((a: any) => a.artist?.name).filter(Boolean);
               return (
                 <LiveCard
                   key={live.id}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    "**/.next/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.d.ts",
+    "packages/db/prisma/**"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-unused-vars": "error",
+    "no-useless-escape": "error"
+  },
+  "overrides": [
+    {
+      "files": ["infra/**"],
+      "rules": {
+        "no-new": "off"
+      }
+    }
+  ]
+}

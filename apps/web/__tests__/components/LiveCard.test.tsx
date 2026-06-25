@@ -27,7 +27,7 @@ describe("LiveCard", () => {
           ticketUrl: "https://example.com",
           ticketPrice: "3,500円",
         }}
-      />
+      />,
     );
     expect(screen.getByText("お笑いライブ")).toBeDefined();
     expect(screen.getByText("ルミネ")).toBeDefined();
@@ -43,7 +43,7 @@ describe("LiveCard", () => {
           type: "online",
         }}
         isNew={true}
-      />
+      />,
     );
     expect(screen.getByText("NEW")).toBeDefined();
   });
@@ -57,7 +57,7 @@ describe("LiveCard", () => {
           type: "offline",
         }}
         isNew={false}
-      />
+      />,
     );
     expect(screen.queryByText("NEW")).toBeNull();
   });
@@ -70,7 +70,7 @@ describe("LiveCard", () => {
           title: "オンラインライブ",
           type: "online",
         }}
-      />
+      />,
     );
     expect(screen.getByText("オンライン")).toBeDefined();
   });
@@ -83,7 +83,7 @@ describe("LiveCard", () => {
           title: "オフラインライブ",
           type: "offline",
         }}
-      />
+      />,
     );
     expect(screen.getByText("オフライン")).toBeDefined();
   });
@@ -97,7 +97,7 @@ describe("LiveCard", () => {
           type: "offline",
           ticketUrl: "https://ticket.example.com",
         }}
-      />
+      />,
     );
     const link = screen.getByText("チケット購入");
     expect(link).toBeDefined();
@@ -113,7 +113,7 @@ describe("LiveCard", () => {
           type: "online",
           streamingEndAt: "2026-04-10T00:00:00.000Z",
         }}
-      />
+      />,
     );
     expect(screen.getByText(/配信終了/)).toBeDefined();
   });
@@ -127,7 +127,7 @@ describe("LiveCard", () => {
           type: "offline",
           performers: ["A", "B", "C", "D", "E"],
         }}
-      />
+      />,
     );
     expect(screen.getByText(/他2名/)).toBeDefined();
   });

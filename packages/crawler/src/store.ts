@@ -4,7 +4,7 @@ import type { LiveData } from "./types";
 
 export async function storeLives(
   livesData: LiveData[],
-  sourceSite: string
+  sourceSite: string,
 ): Promise<{ newLives: Live[] }> {
   const newLives: Live[] = [];
 
@@ -43,17 +43,11 @@ export async function storeLives(
   return { newLives };
 }
 
-async function matchAndLinkArtists(
-  liveId: string,
-  artistNames: string[]
-): Promise<void> {
+async function matchAndLinkArtists(liveId: string, artistNames: string[]): Promise<void> {
   const allArtists = await prisma.artist.findMany();
 
   for (const name of artistNames) {
-    const matched = allArtists.find(
-      (a) =>
-        a.name === name || a.aliases.includes(name)
-    );
+    const matched = allArtists.find((a) => a.name === name || a.aliases.includes(name));
 
     if (matched) {
       await prisma.liveArtist.create({

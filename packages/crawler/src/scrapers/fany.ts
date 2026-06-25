@@ -73,9 +73,7 @@ export class FanyScraper implements Scraper {
     const url = `${SEARCH_API}?offset=${offset}`;
     const res = await fetch(url);
     if (!res.ok) {
-      throw new Error(
-        `Failed to fetch ${url}: ${res.status} ${res.statusText}`
-      );
+      throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
     }
     const data: unknown = await res.json();
     if (!Array.isArray(data)) return [];
@@ -104,9 +102,7 @@ export class FanyScraper implements Scraper {
       ticketPrice,
       ticketPriceMin,
       ticketStatus: bestSale?.display_sales_status ?? "",
-      ticketUrl: bestSale?.destination_url
-        ? normalizeUrl(bestSale.destination_url)
-        : "",
+      ticketUrl: bestSale?.destination_url ? normalizeUrl(bestSale.destination_url) : "",
       sourceUrl: `${BASE_URL}/event/detail/${p.event_id}/${p.id}`,
       artistNames: performers,
     };
@@ -147,9 +143,9 @@ function parsePerformers(detail: string): string[] {
   if (!detail || !detail.trim()) return [];
   const cleaned = stripHtml(detail);
   // Remove role prefixes like [ネタ], [MC], 【ゲスト】 etc.
-  const withoutRoles = cleaned.replace(/[\[［【][^\]］】]*[\]］】]/g, "");
+  const withoutRoles = cleaned.replace(/[[［【][^\]］】]*[\]］】]/g, "");
   return withoutRoles
-    .split(/[／\/、,]/)
+    .split(/[／/、,]/)
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
 }
@@ -169,24 +165,18 @@ function normalizeUrl(url: string): string {
  * Pick the "best" sale entry to represent ticket status/URL.
  * Priority: currently on-sale > upcoming > ended.
  */
-function pickBestSale(
-  sales: FanyPerformanceSale[]
-): FanyPerformanceSale | undefined {
+function pickBestSale(sales: FanyPerformanceSale[]): FanyPerformanceSale | undefined {
   if (!sales || sales.length === 0) return undefined;
 
   // On-sale indicators
   const onSale = sales.find(
-    (s) =>
-      s.display_sales_status.includes("発売中") ||
-      s.display_sales_status.includes("受付中")
+    (s) => s.display_sales_status.includes("発売中") || s.display_sales_status.includes("受付中"),
   );
   if (onSale) return onSale;
 
   // Upcoming
   const upcoming = sales.find(
-    (s) =>
-      s.display_sales_status.includes("受付前") ||
-      s.display_sales_status.includes("発売前")
+    (s) => s.display_sales_status.includes("受付前") || s.display_sales_status.includes("発売前"),
   );
   if (upcoming) return upcoming;
 

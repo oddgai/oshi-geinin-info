@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { ArtistCard } from "@/components/ArtistCard";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";

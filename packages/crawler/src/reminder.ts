@@ -4,7 +4,15 @@ export async function handler() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const startOfTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-  const endOfTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 23, 59, 59, 999);
+  const endOfTomorrow = new Date(
+    tomorrow.getFullYear(),
+    tomorrow.getMonth(),
+    tomorrow.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
 
   const expiringLives = await prisma.live.findMany({
     where: {

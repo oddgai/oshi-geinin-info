@@ -3,17 +3,8 @@ import { parseZaikoEventCard, parseZaikoDatetime } from "./zaiko";
 
 describe("parseZaikoEventCard", () => {
   it("parses a typical event card", () => {
-    const texts = [
-      "お笑いライブ 2026",
-      "2026/04/15 19:00",
-      "渋谷ライブハウス",
-      "¥3,500",
-      "発売中",
-    ];
-    const result = parseZaikoEventCard(
-      texts,
-      "https://zaiko.io/event/12345"
-    );
+    const texts = ["お笑いライブ 2026", "2026/04/15 19:00", "渋谷ライブハウス", "¥3,500", "発売中"];
+    const result = parseZaikoEventCard(texts, "https://zaiko.io/event/12345");
 
     expect(result).not.toBeNull();
     expect(result!.title).toBe("お笑いライブ 2026");
@@ -28,10 +19,7 @@ describe("parseZaikoEventCard", () => {
 
   it("detects online events", () => {
     const texts = ["オンライン配信ライブ", "2026/05/01 20:00"];
-    const result = parseZaikoEventCard(
-      texts,
-      "https://zaiko.io/event/99999"
-    );
+    const result = parseZaikoEventCard(texts, "https://zaiko.io/event/99999");
 
     expect(result!.type).toBe("online");
   });
@@ -41,17 +29,12 @@ describe("parseZaikoEventCard", () => {
   });
 
   it("returns null for empty title", () => {
-    expect(
-      parseZaikoEventCard([""], "https://zaiko.io/event/1")
-    ).toBeNull();
+    expect(parseZaikoEventCard([""], "https://zaiko.io/event/1")).toBeNull();
   });
 
   it("handles card with minimal info", () => {
     const texts = ["ライブイベント"];
-    const result = parseZaikoEventCard(
-      texts,
-      "https://zaiko.io/event/1"
-    );
+    const result = parseZaikoEventCard(texts, "https://zaiko.io/event/1");
 
     expect(result).not.toBeNull();
     expect(result!.title).toBe("ライブイベント");
@@ -63,27 +46,19 @@ describe("parseZaikoEventCard", () => {
 
 describe("parseZaikoDatetime", () => {
   it("parses YYYY/MM/DD HH:MM", () => {
-    expect(parseZaikoDatetime("2026/04/15 19:00")).toEqual(
-      new Date(2026, 3, 15, 19, 0)
-    );
+    expect(parseZaikoDatetime("2026/04/15 19:00")).toEqual(new Date(2026, 3, 15, 19, 0));
   });
 
   it("parses YYYY-MM-DD HH:MM", () => {
-    expect(parseZaikoDatetime("2026-04-15 19:00")).toEqual(
-      new Date(2026, 3, 15, 19, 0)
-    );
+    expect(parseZaikoDatetime("2026-04-15 19:00")).toEqual(new Date(2026, 3, 15, 19, 0));
   });
 
   it("parses YYYY.MM.DD HH:MM", () => {
-    expect(parseZaikoDatetime("2026.04.15 19:00")).toEqual(
-      new Date(2026, 3, 15, 19, 0)
-    );
+    expect(parseZaikoDatetime("2026.04.15 19:00")).toEqual(new Date(2026, 3, 15, 19, 0));
   });
 
   it("parses date without time", () => {
-    expect(parseZaikoDatetime("2026/04/15")).toEqual(
-      new Date(2026, 3, 15)
-    );
+    expect(parseZaikoDatetime("2026/04/15")).toEqual(new Date(2026, 3, 15));
   });
 
   it("returns null for unparseable text", () => {

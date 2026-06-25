@@ -1,9 +1,7 @@
 import { prisma } from "@oshi-geinin/db";
 import type { User, Live } from "@oshi-geinin/db";
 
-export async function findUsersToNotify(
-  liveId: string
-): Promise<User[]> {
+export async function findUsersToNotify(liveId: string): Promise<User[]> {
   const liveArtists = await prisma.liveArtist.findMany({
     where: { liveId },
     select: { artistId: true },
@@ -33,10 +31,7 @@ export async function findUsersToNotify(
   return Array.from(uniqueUsers.values());
 }
 
-export async function sendNewLiveNotification(
-  user: User,
-  live: Live
-): Promise<void> {
+export async function sendNewLiveNotification(user: User, live: Live): Promise<void> {
   const message = [
     `お気に入り芸人の新着ライブ！`,
     ``,
@@ -57,10 +52,7 @@ export async function sendNewLiveNotification(
   });
 }
 
-async function pushLineMessage(
-  lineUserId: string,
-  message: string
-): Promise<void> {
+async function pushLineMessage(lineUserId: string, message: string): Promise<void> {
   const res = await fetch("https://api.line.me/v2/bot/message/push", {
     method: "POST",
     headers: {

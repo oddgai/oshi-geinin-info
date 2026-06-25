@@ -15,11 +15,7 @@ async function getLive(id: string) {
   }
 }
 
-export default async function LiveDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function LiveDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const data = await getLive(id);
 
@@ -54,10 +50,7 @@ export default async function LiveDetailPage({
 
   return (
     <div className="max-w-2xl">
-      <Link
-        href="/lives"
-        className="inline-block text-sm text-blue-600 hover:text-blue-700 mb-4"
-      >
+      <Link href="/lives" className="inline-block text-sm text-blue-600 hover:text-blue-700 mb-4">
         ← ライブ一覧に戻る
       </Link>
 
@@ -65,9 +58,7 @@ export default async function LiveDetailPage({
         <div className="flex flex-wrap gap-2 mb-3">
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded ${
-              isOnline
-                ? "bg-blue-100 text-blue-700"
-                : "bg-green-100 text-green-700"
+              isOnline ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
             }`}
           >
             {isOnline ? "オンライン" : "オフライン"}
@@ -110,9 +101,7 @@ export default async function LiveDetailPage({
 
         {live.artists && live.artists.length > 0 && (
           <div className="mt-6">
-            <h2 className="text-base font-semibold text-gray-900 mb-2">
-              出演者
-            </h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-2">出演者</h2>
             <ul className="space-y-1">
               {live.artists.map((a: any) => (
                 <li key={a.artist.id}>
@@ -143,9 +132,7 @@ export default async function LiveDetailPage({
 
         {(live.relatedLive || live.relatedFrom) && (
           <div className="mt-6 pt-6 border-t border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900 mb-2">
-              関連ライブ
-            </h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-2">関連ライブ</h2>
             {live.relatedLive && (
               <Link
                 href={`/lives/${live.relatedLive.id}`}

@@ -103,9 +103,7 @@ describe("extractDatetimeFromTitle", () => {
   });
 
   it("extracts 年月日 format", () => {
-    const result = extractDatetimeFromTitle(
-      "テスト 2026年4月1日(火) 19:00"
-    );
+    const result = extractDatetimeFromTitle("テスト 2026年4月1日(火) 19:00");
     expect(result).toBe("2026年4月1日(火) 19:00");
   });
 

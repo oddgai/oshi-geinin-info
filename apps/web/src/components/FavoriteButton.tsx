@@ -7,10 +7,7 @@ type FavoriteButtonProps = {
   initialFavorited?: boolean;
 };
 
-export function FavoriteButton({
-  artistId,
-  initialFavorited = false,
-}: FavoriteButtonProps) {
+export function FavoriteButton({ artistId, initialFavorited = false }: FavoriteButtonProps) {
   const [favorited, setFavorited] = useState(initialFavorited);
   const [loading, setLoading] = useState(false);
 

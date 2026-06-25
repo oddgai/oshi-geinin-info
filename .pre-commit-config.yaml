@@ -19,13 +19,22 @@ repos:
       - id: mixed-line-ending
         args: [--fix=no]
 
-  # ruff（lint + format）。設定は ruff.toml を自動参照する
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 745be0411e3c150e246d527e531e5a221b8c3462 # frozen: v0.15.19
+  # oxlint + oxfmt（lint + format）。バージョンは package.json で固定する。
+  # pnpm 経由でローカルの devDependencies を使うため repo: local とする。
+  - repo: local
     hooks:
-      - id: ruff-check
-        args: [--fix]
-      - id: ruff-format
+      - id: oxfmt
+        name: oxfmt (format)
+        entry: pnpm format
+        language: system
+        pass_filenames: false
+        types_or: [ts, tsx, javascript, jsx, json]
+      - id: oxlint
+        name: oxlint (lint --fix)
+        entry: pnpm lint:fix
+        language: system
+        pass_filenames: false
+        types_or: [ts, tsx, javascript, jsx]
 
   # クレデンシャルのハードコードを検出する（https://gitleaks.io/）
   - repo: https://github.com/gitleaks/gitleaks

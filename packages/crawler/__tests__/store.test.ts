@@ -122,10 +122,7 @@ describe("storeLives", () => {
     mockPrismaLive.create.mockResolvedValue(secondCreatedLive);
     mockPrismaArtist.findMany.mockResolvedValue([]);
 
-    const result = await storeLives(
-      [sampleLiveData, secondLiveData],
-      "example.com"
-    );
+    const result = await storeLives([sampleLiveData, secondLiveData], "example.com");
 
     expect(mockPrismaLive.create).toHaveBeenCalledOnce();
     expect(result.newLives).toHaveLength(1);

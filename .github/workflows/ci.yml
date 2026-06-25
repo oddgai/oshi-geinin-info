@@ -15,16 +15,20 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
-      - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
-      - name: make check (ruff lint + format)
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: make check (oxlint + oxfmt + knip)
         run: make check
 
   build:
@@ -36,8 +40,32 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           persist-credentials: false
-      - name: docker compose build
-        run: docker compose build
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build (turbo)
+        run: pnpm build
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Test (turbo)
+        run: pnpm test
 
   gitleaks:
     runs-on: ubuntu-latest
@@ -110,7 +138,7 @@ jobs:
   # 注意: 新しいジョブを追加したら、必ずいずれかの gate の needs に加えること。
   #       加え忘れると、そのジョブが落ちても必須チェックは通りマージできてしまう。
   ci:
-    needs: [lint, build]
+    needs: [lint, build, test]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}
@@ -120,9 +148,10 @@ jobs:
         env:
           LINT: ${{ needs.lint.result }}
           BUILD: ${{ needs.build.result }}
+          TEST: ${{ needs.test.result }}
         run: |
-          echo "lint=$LINT build=$BUILD"
-          [ "$LINT" = success ] && [ "$BUILD" = success ]
+          echo "lint=$LINT build=$BUILD test=$TEST"
+          [ "$LINT" = success ] && [ "$BUILD" = success ] && [ "$TEST" = success ]
 
   security:
     needs: [gitleaks, pinact, actionlint, zizmor]

@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  TigetScraper,
-  parseTigetListPage,
-  parseTigetDatetime,
-} from "./tiget";
+import { TigetScraper, parseTigetListPage, parseTigetDatetime } from "./tiget";
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -174,21 +170,15 @@ describe("parseTigetListPage", () => {
 
 describe("parseTigetDatetime", () => {
   it("parses date with time", () => {
-    expect(parseTigetDatetime("2026年4月1日(水) 19:00")).toEqual(
-      new Date(2026, 3, 1, 19, 0)
-    );
+    expect(parseTigetDatetime("2026年4月1日(水) 19:00")).toEqual(new Date(2026, 3, 1, 19, 0));
   });
 
   it("parses date without time", () => {
-    expect(parseTigetDatetime("2026年4月1日(水)")).toEqual(
-      new Date(2026, 3, 1)
-    );
+    expect(parseTigetDatetime("2026年4月1日(水)")).toEqual(new Date(2026, 3, 1));
   });
 
   it("parses zero-padded date", () => {
-    expect(parseTigetDatetime("2026年04月01日(水)")).toEqual(
-      new Date(2026, 3, 1)
-    );
+    expect(parseTigetDatetime("2026年04月01日(水)")).toEqual(new Date(2026, 3, 1));
   });
 
   it("returns null for unparseable text", () => {
@@ -220,7 +210,7 @@ function buildMockListPage(events: MockEvent[]): string {
       場所：${e.venue}
       ${e.status}
     </a>
-  `
+  `,
     )
     .join("\n");
 

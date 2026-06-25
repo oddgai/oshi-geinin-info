@@ -71,9 +71,7 @@ export class YoshimotoScraper implements Scraper {
     const datetimeText = extractDatetimeFromTitle(p.title);
     const startAt = parseYoshimotoDatetime(datetimeText);
     const priceText = p.price ? `${p.price}円` : "";
-    const ticketPriceMin = p.price
-      ? parseMinPrice(priceText)
-      : null;
+    const ticketPriceMin = p.price ? parseMinPrice(priceText) : null;
 
     return {
       title: p.title,
@@ -105,7 +103,7 @@ export class YoshimotoScraper implements Scraper {
 export function extractProductsFromHtml(html: string): YoshimotoProduct[] {
   // Try to extract from the PG_all_product_items JS variable
   const jsMatch = html.match(
-    /PG_all_product_items\s*=\s*(\[[\s\S]*?\]);\s*(?:var|let|const|\/\/|$)/
+    /PG_all_product_items\s*=\s*(\[[\s\S]*?\]);\s*(?:var|let|const|\/\/|$)/,
   );
   if (jsMatch) {
     try {
@@ -158,15 +156,11 @@ function extractProductsFromDom(html: string): YoshimotoProduct[] {
  */
 export function extractDatetimeFromTitle(title: string): string {
   // Try 年月日 format first: "2026年4月1日(火) 19:00"
-  const nenMatch = title.match(
-    /\d{4}年\d{1,2}月\d{1,2}日.*?\d{1,2}:\d{2}/
-  );
+  const nenMatch = title.match(/\d{4}年\d{1,2}月\d{1,2}日.*?\d{1,2}:\d{2}/);
   if (nenMatch) return nenMatch[0];
 
   // Try M/D HH:MM format: "(3/26 21:00)" or "（3/26　21:00）"
-  const slashMatch = title.match(
-    /(\d{1,2})\/(\d{1,2})\s*[　\s]*(\d{1,2}):(\d{2})/
-  );
+  const slashMatch = title.match(/(\d{1,2})\/(\d{1,2})\s*[　\s]*(\d{1,2}):(\d{2})/);
   if (slashMatch) {
     const [, month, day, hour, minute] = slashMatch;
     return `${month}/${day} ${hour}:${minute}`;
@@ -187,35 +181,19 @@ export function extractDatetimeFromTitle(title: string): string {
  */
 export function parseYoshimotoDatetime(text: string): Date | null {
   // Try 年月日 format first (handled by shared parseDatetime)
-  const nenMatch = text.match(
-    /(\d{4})年(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})/
-  );
+  const nenMatch = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})/);
   if (nenMatch) {
     const [, year, month, day, hour, minute] = nenMatch;
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }
 
   // Try M/D HH:MM format (assume current year)
-  const slashMatch = text.match(
-    /(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})/
-  );
+  const slashMatch = text.match(/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})/);
   if (slashMatch) {
     const [, month, day, hour, minute] = slashMatch;
     const now = new Date();
     const year = now.getFullYear();
-    const date = new Date(
-      year,
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    const date = new Date(year, Number(month) - 1, Number(day), Number(hour), Number(minute));
     // If the date is more than 2 months in the past, assume next year
     if (date.getTime() < now.getTime() - 60 * 24 * 60 * 60 * 1000) {
       date.setFullYear(year + 1);
@@ -230,21 +208,16 @@ export function parseYoshimotoDatetime(text: string): Date | null {
  * Extract artist names from the content field.
  * The content field is a concatenation of product text including performer info.
  */
-function extractArtistsFromContent(
-  content: string,
-  title: string
-): string[] {
+function extractArtistsFromContent(content: string, title: string): string[] {
   // Remove the title portion from content to isolate description
   const desc = content.replace(title, "").trim();
   if (!desc) return [];
 
   // Look for performer patterns: 出演：X, Y, Z or 出演者：X / Y
-  const performerMatch = desc.match(
-    /出演[者]?[：:]\s*(.+?)(?:\n|$|。)/
-  );
+  const performerMatch = desc.match(/出演[者]?[：:]\s*(.+?)(?:\n|$|。)/);
   if (performerMatch) {
     return performerMatch[1]
-      .split(/[、,／\/]/)
+      .split(/[、,／/]/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
   }

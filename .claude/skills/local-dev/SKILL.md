@@ -1,71 +1,85 @@
 ---
 name: local-dev
-description: oshi-geinin-info のローカル開発手順。FastAPI backend と Streamlit frontend を docker compose で起動し、依存追加・lint/format・PR 前チェックを行う方法。アプリの起動・動作確認・依存追加・コード整形を行うときに使用する。
+description: oshi-geinin-info のローカル開発手順。pnpm + turbo の Turborepo monorepo（Next.js / Crawlee / Prisma / SST）を起動し、依存追加・lint/format・未使用検出・PR 前チェックを行う方法。アプリの起動・動作確認・依存追加・コード整形を行うときに使用する。
 ---
 
 # Local Development
 
-FastAPI backend + Streamlit frontend を docker compose で動かすプロジェクトのローカル開発手順。
+Turborepo monorepo（pnpm + turbo）のローカル開発手順。
 
 ## When to Apply
 
 - アプリを起動して動作確認する
 - 依存パッケージを追加・更新する
-- lint / format を実行する、または PR 前にチェックする
+- lint / format / 未使用検出を実行する、または PR 前にチェックする
 
 ## 構成
 
-- `backend/` … FastAPI（uv 管理、Python 3.12）。ポート `8000`
-- `frontend/` … Streamlit（uv 管理、Python 3.12）。ポート `8501`。`BACKEND_HOST` 経由で backend を呼ぶ
-- `docker-compose.yml` … 両サービスを `fastapi_streamlit_network` で接続
+- `apps/web` … Next.js（App Router）フロント + API ルート
+- `packages/crawler` … Crawlee / cheerio クローラー（AWS Lambda ハンドラ）
+- `packages/db` … Prisma スキーマ + PrismaClient（Supabase / PostgreSQL）
+- `packages/shared` … 共通ユーティリティ（日時・料金パース等）
+- `infra` … SST（AWS Lambda + EventBridge）
 - ルートの `Makefile` … 開発タスクのエントリポイント
 
-> 将来的に TypeScript への移行を予定。コマンド/CLAUDE.md は `make check` などのタスク抽象を介しているため、移行時は Makefile と各サブプロジェクトのみ差し替えれば済む設計。
+パッケージマネージャは `pnpm`（`packageManager` フィールドで固定）。`pnpm-workspace.yaml` で workspace を定義する。
 
-## 起動・停止
+## セットアップ・起動
 
 ```bash
-make up    # docker compose up
-make down  # コンテナ・イメージ・ボリュームを削除して停止
+make install   # pnpm install（postinstall ビルドは pnpm-workspace.yaml の allowBuilds で制御）
+make dev       # turbo dev（各 workspace の dev を起動）
 ```
 
-起動後:
+- web: http://localhost:3000
 
-- backend: http://localhost:8000 （`/`, `/hello`、docs は `/docs`）
-- frontend: http://localhost:8501
+環境変数は `.env.example` を参照（`DATABASE_URL`, LINE / NextAuth トークン）。
+
+## DB（Prisma）
+
+```bash
+pnpm --filter @oshi-geinin/db db:generate  # Prisma Client 生成（build でも自動実行）
+pnpm --filter @oshi-geinin/db db:push      # スキーマを Supabase に反映
+pnpm --filter @oshi-geinin/db db:seed      # テスト用芸人データ投入
+```
+
+スキーマは `packages/db/prisma/schema.prisma`。`turbo build` は `@oshi-geinin/db#build`（= `prisma generate`）に依存するため、build/test 前に Client が生成される。
 
 ## 依存の追加
 
-各サブプロジェクトで uv を使う（ルートではなく `backend/` か `frontend/` で実行）。
-
 ```bash
-cd backend  && uv add <package>   # 本体依存
-cd frontend && uv add <package>
-uv add --dev <package>            # 開発用依存
+pnpm --filter @oshi-geinin/web add <package>        # 特定 workspace に追加
+pnpm --filter @oshi-geinin/web add -D <package>     # 開発用依存
+pnpm add -Dw <package>                              # ルート（リポ全体のツール）に追加
 ```
 
-`uv.lock` は必ずコミットする。
+`pnpm-lock.yaml` は必ずコミットする。
 
-## lint / format
+## lint / format / 未使用検出
 
-ruff を `make` 経由で実行する（ruff 本体は `uvx` でオンデマンド取得）。
+oxlint（lint）+ oxfmt（format）+ knip（未使用検出）を `make` 経由で実行する。
 
 ```bash
-make lint       # ruff check
-make fmt        # ruff format + check --fix（コミット前に実行）
-make check      # lint + format チェック（PR 前のゲート・書き換えなし）
+make lint   # oxlint --max-warnings=0
+make fmt    # oxfmt --write + oxlint --fix（コミット前に実行）
+make knip   # 未使用のファイル / 依存 / export を検出
+make check  # lint + fmt-check + knip（PR 前のゲート・書き換えなし）
+make build  # turbo build
+make test   # turbo test（vitest）
 ```
+
+設定: `.oxlintrc.json` / `.oxfmtrc.json` / `knip.json`。ツールのバージョンは `package.json` の devDependencies で固定する。実行時のみ必要で静的 import されない依存（例: `@sparticuz/chromium`、SST の `aws-cdk-lib`）は `knip.json` の `ignoreDependencies` に登録する。
 
 ## pre-commit
 
-コミット前に gitleaks・ruff・ファイル衛生（末尾空白 / EOF / 巨大ファイル禁止 / 改行コード）を実行する。
+コミット前に gitleaks・oxlint/oxfmt・ファイル衛生（末尾空白 / EOF / 巨大ファイル禁止 / 改行コード）を実行する。
 
 ```bash
 make hooks       # フックを登録（初回のみ。内部は uvx pre-commit install）
 make pre-commit  # 全ファイルに対して手動実行
 ```
 
-設定は `.pre-commit-config.yaml`。`rev` はコミットハッシュ固定。フックの更新は `make update-hooks`（`pre-commit autoupdate --freeze`）で行う（Dependabot は pre-commit 対象外）。
+設定は `.pre-commit-config.yaml`。`rev` はコミットハッシュ固定。oxlint/oxfmt は `repo: local` で pnpm の devDependencies を使う。フレームワーク側フックの更新は `make update-hooks`（`pre-commit autoupdate --freeze`）で行う（Dependabot は pre-commit 対象外）。
 
 ## GitHub Actions のセキュリティ検査
 
@@ -78,8 +92,8 @@ actionlint                   # YAML 静的検査（brew install actionlint）
 
 ## 依存・Actions の更新（Dependabot）
 
-`.github/dependabot.yml` で GitHub Actions と uv 依存（backend / frontend）の更新 PR を weekly で自動生成する。
-GitHub 純正なのでアプリのインストールは不要。pre-commit フックは Dependabot の対象外なので `make update-hooks` で更新する。
+`.github/dependabot.yml` で GitHub Actions と npm 依存（pnpm workspace 全体）の更新 PR を weekly で自動生成する。
+GitHub 純正なのでアプリのインストールは不要。pre-commit フレームワークのフックは Dependabot の対象外なので `make update-hooks` で更新する。
 
 ## GitHub Actions の固定（pinact）
 

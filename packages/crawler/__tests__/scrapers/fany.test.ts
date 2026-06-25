@@ -4,18 +4,10 @@ import { FanyScraper } from "../../src/scrapers/fany";
 // Mock @oshi-geinin/shared
 vi.mock("@oshi-geinin/shared", () => ({
   parseDatetime: vi.fn((text: string) => {
-    const match = text.match(
-      /(\d{4})\/(\d{1,2})\/(\d{1,2}).*?(\d{1,2}):(\d{2})/
-    );
+    const match = text.match(/(\d{4})\/(\d{1,2})\/(\d{1,2}).*?(\d{1,2}):(\d{2})/);
     if (!match) return null;
     const [, year, month, day, hour, minute] = match;
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }),
   parseMinPrice: vi.fn((text: string) => {
     const matches = text.match(/[\d,]+(?=円)/g);
@@ -32,10 +24,8 @@ function makeMockPerformance(overrides: Record<string, unknown> = {}) {
     event_id: 9999,
     name: "テストライブ 2026",
     venue_name: 'ルミネtheよしもと(<span class="g-dayofweek">東京都</span>)',
-    performer_detail:
-      "[ネタ]チュートリアル／マユリカ／金属バット",
-    performance_date:
-      '2026/04/01(<span class="g-dayofweek">火</span>)',
+    performer_detail: "[ネタ]チュートリアル／マユリカ／金属バット",
+    performance_date: '2026/04/01(<span class="g-dayofweek">火</span>)',
     open_start_time_text: "開場 18:00  開演 18:30",
     streaming_method_code: "00",
     precautions_detail: "前売 3,500円（税込） 当日 4,000円（税込）",
@@ -79,28 +69,16 @@ describe("FanyScraper", () => {
 
       expect(result.title).toBe("テストライブ 2026");
       expect(result.venue).toBe("ルミネtheよしもと(東京都)");
-      expect(result.datetimeText).toBe(
-        "2026/04/01(火) 開場 18:00  開演 18:30"
-      );
-      expect(result.startAt).toEqual(
-        new Date(2026, 3, 1, 18, 0)
-      );
+      expect(result.datetimeText).toBe("2026/04/01(火) 開場 18:00  開演 18:30");
+      expect(result.startAt).toEqual(new Date(2026, 3, 1, 18, 0));
       expect(result.endAt).toBeNull();
       expect(result.type).toBe("offline");
       expect(result.ticketPrice).toBe("3,500円（税込） / 4,000円（税込）");
       expect(result.ticketPriceMin).toBe(3500);
       expect(result.ticketStatus).toBe("先着発売中");
-      expect(result.ticketUrl).toBe(
-        "https://ticket.fany.lol/reception/50000/12345"
-      );
-      expect(result.sourceUrl).toBe(
-        "https://ticket.fany.lol/event/detail/9999/12345"
-      );
-      expect(result.artistNames).toEqual([
-        "チュートリアル",
-        "マユリカ",
-        "金属バット",
-      ]);
+      expect(result.ticketUrl).toBe("https://ticket.fany.lol/reception/50000/12345");
+      expect(result.sourceUrl).toBe("https://ticket.fany.lol/event/detail/9999/12345");
+      expect(result.artistNames).toEqual(["チュートリアル", "マユリカ", "金属バット"]);
     });
 
     it("handles online events based on streaming_method_code", () => {
@@ -153,9 +131,7 @@ describe("FanyScraper", () => {
       });
       const result = scraper.toLiveData(perf as never);
       expect(result.ticketStatus).toBe("先着発売中");
-      expect(result.ticketUrl).toBe(
-        "https://ticket.fany.lol/reception/current/12345"
-      );
+      expect(result.ticketUrl).toBe("https://ticket.fany.lol/reception/current/12345");
     });
 
     it("prefers upcoming sale over ended sale", () => {
@@ -177,9 +153,7 @@ describe("FanyScraper", () => {
       });
       const result = scraper.toLiveData(perf as never);
       expect(result.ticketStatus).toBe("受付前");
-      expect(result.ticketUrl).toBe(
-        "https://ticket.fany.lol/reception/upcoming/12345"
-      );
+      expect(result.ticketUrl).toBe("https://ticket.fany.lol/reception/upcoming/12345");
     });
 
     it("falls back to event name when performance name is empty", () => {
@@ -205,29 +179,21 @@ describe("FanyScraper", () => {
           {
             display_sales_status: "先着発売中",
             display_sales_style: "fany_icon__onsale",
-            destination_url:
-              "https://ticket.fany.lol/reception/50000/12345",
+            destination_url: "https://ticket.fany.lol/reception/50000/12345",
             sales_name: "一般発売",
           },
         ],
       });
       const result = scraper.toLiveData(perf as never);
-      expect(result.ticketUrl).toBe(
-        "https://ticket.fany.lol/reception/50000/12345"
-      );
+      expect(result.ticketUrl).toBe("https://ticket.fany.lol/reception/50000/12345");
     });
 
     it("strips role prefixes from performer names", () => {
       const perf = makeMockPerformance({
-        performer_detail:
-          "[MC]司会者／[ゲスト]ゲスト芸人／【特別出演】特別芸人",
+        performer_detail: "[MC]司会者／[ゲスト]ゲスト芸人／【特別出演】特別芸人",
       });
       const result = scraper.toLiveData(perf as never);
-      expect(result.artistNames).toEqual([
-        "司会者",
-        "ゲスト芸人",
-        "特別芸人",
-      ]);
+      expect(result.artistNames).toEqual(["司会者", "ゲスト芸人", "特別芸人"]);
     });
   });
 
@@ -253,12 +219,8 @@ describe("FanyScraper", () => {
       const results = await scraper.scrape();
 
       expect(fetchMock).toHaveBeenCalledTimes(2);
-      expect(fetchMock).toHaveBeenCalledWith(
-        "https://ticket.fany.lol/search/event_more?offset=0"
-      );
-      expect(fetchMock).toHaveBeenCalledWith(
-        "https://ticket.fany.lol/search/event_more?offset=10"
-      );
+      expect(fetchMock).toHaveBeenCalledWith("https://ticket.fany.lol/search/event_more?offset=0");
+      expect(fetchMock).toHaveBeenCalledWith("https://ticket.fany.lol/search/event_more?offset=10");
       expect(results).toHaveLength(2);
       expect(results[0].title).toBe("テストライブ 2026");
 
@@ -272,12 +234,10 @@ describe("FanyScraper", () => {
           ok: false,
           status: 500,
           statusText: "Internal Server Error",
-        })
+        }),
       );
 
-      await expect(scraper.scrape()).rejects.toThrow(
-        "Failed to fetch"
-      );
+      await expect(scraper.scrape()).rejects.toThrow("Failed to fetch");
 
       vi.unstubAllGlobals();
     });
@@ -288,7 +248,7 @@ describe("FanyScraper", () => {
         vi.fn().mockResolvedValue({
           ok: true,
           json: async () => ({ error: "unexpected" }),
-        })
+        }),
       );
 
       const results = await scraper.scrape();

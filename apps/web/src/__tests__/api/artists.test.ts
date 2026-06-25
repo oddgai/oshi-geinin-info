@@ -128,7 +128,7 @@ describe("GET /api/artists/[id]", () => {
     expect(response.status).toBe(200);
     expect(data.artist).toEqual(mockArtist);
     expect(mockPrisma.artist.findUnique).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "artist-1" } })
+      expect.objectContaining({ where: { id: "artist-1" } }),
     );
   });
 

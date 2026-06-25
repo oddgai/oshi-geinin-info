@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import { parseMinPrice } from "@oshi-geinin/shared";
 import type { Scraper } from "./base";
 import type { LiveData } from "../types";
 
@@ -7,33 +6,6 @@ const BASE_URL = "https://tiget.net";
 // TODO: Tag/category should be configurable per deployment.
 const EVENTS_URL = `${BASE_URL}/events`;
 const MAX_PAGES = 20; // safety limit
-
-/**
- * JSON-LD Event schema found on tiget.net detail pages.
- */
-interface TigetJsonLd {
-  "@type": string;
-  name: string;
-  startDate: string;
-  location?: {
-    "@type": string;
-    name: string;
-    address?: {
-      addressLocality?: string;
-      addressRegion?: string;
-    };
-  };
-  image?: string;
-  description?: string;
-  performer?: {
-    name?: string;
-  };
-  offers?: {
-    url?: string;
-    price?: string;
-    availability?: string;
-  };
-}
 
 /**
  * Intermediate type for event info scraped from list pages.
@@ -77,9 +49,7 @@ export class TigetScraper implements Scraper {
       const res = await fetch(url);
       if (!res.ok) {
         if (res.status === 404) break; // No more pages
-        throw new Error(
-          `Failed to fetch ${url}: ${res.status} ${res.statusText}`
-        );
+        throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
       }
       const html = await res.text();
       const events = parseTigetListPage(html);
@@ -160,7 +130,7 @@ export function parseTigetListPage(html: string): TigetListEvent[] {
 
     const performers = performerText
       ? performerText
-          .split(/[、,／\/]/)
+          .split(/[、,／/]/)
           .map((s) => s.trim())
           .filter((s) => s.length > 0)
       : [];
@@ -186,18 +156,10 @@ export function parseTigetListPage(html: string): TigetListEvent[] {
  */
 export function parseTigetDatetime(text: string): Date | null {
   // Try full datetime with time
-  const fullMatch = text.match(
-    /(\d{4})年(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})/
-  );
+  const fullMatch = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})日.*?(\d{1,2}):(\d{2})/);
   if (fullMatch) {
     const [, year, month, day, hour, minute] = fullMatch;
-    return new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      Number(hour),
-      Number(minute)
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
   }
 
   // Try date only
@@ -236,14 +198,7 @@ function extractField(lines: string[], prefix: string): string {
 
 /** Extract ticket status from text lines. */
 function extractTigetStatus(lines: string[]): string {
-  const statusPatterns = [
-    "受付中",
-    "完売",
-    "受付終了",
-    "完売・受付終了",
-    "販売前",
-    "受付前",
-  ];
+  const statusPatterns = ["受付中", "完売", "受付終了", "完売・受付終了", "販売前", "受付前"];
   for (const line of lines) {
     if (statusPatterns.some((p) => line.includes(p))) return line;
     if (/^あと\d+日$/.test(line)) return line;

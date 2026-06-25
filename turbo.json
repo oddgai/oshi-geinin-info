@@ -5,13 +5,15 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
+    "@oshi-geinin/db#build": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "test": {
       "dependsOn": ["^build"]
-    },
-    "lint": {}
+    }
   }
 }
