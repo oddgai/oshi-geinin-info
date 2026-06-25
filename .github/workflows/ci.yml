@@ -105,8 +105,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: uvx zizmor@1.26.1 .github/
 
-  # 集約チェック（種類ごと）。Ruleset の必須チェックはこの 2 つだけにする。
+  # 集約チェック（種類ごと）。Ruleset の必須チェックはこの 2 つ（ci / security）だけにする。
   # 個別ジョブを増減してもこの gate が束ねるため Ruleset 側の変更は不要。
+  # 注意: 新しいジョブを追加したら、必ずいずれかの gate の needs に加えること。
+  #       加え忘れると、そのジョブが落ちても必須チェックは通りマージできてしまう。
   ci:
     needs: [lint, build]
     runs-on: ubuntu-latest

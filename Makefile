@@ -1,7 +1,9 @@
 .DEFAULT_GOAL := help
 
-# ruff はネットワーク経由で uvx により取得・実行する（ローカルへの追加インストール不要）
-RUFF := uvx ruff
+# ruff は uvx でオンデマンド取得・実行する（ローカルへの追加インストール不要）。
+# バージョンは .pre-commit-config.yaml の ruff-pre-commit と揃えて固定する
+# （非固定だと ruff の新リリースで「無変更なのに CI が落ちる」事故が起きるため）。
+RUFF := uvx ruff@0.15.19
 
 .PHONY: help
 help: ## このヘルプを表示
