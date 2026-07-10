@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@oshi-geinin/db";
 import { authOptions } from "@/lib/auth";
+import { withApiLogging } from "@/lib/logger";
 
 async function getAuthenticatedUserId(): Promise<string | null> {
   const session = await getServerSession(authOptions);
   return (session as any)?.userId ?? null;
 }
 
-export async function GET() {
+export const GET = withApiLogging(async () => {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -21,9 +22,9 @@ export async function GET() {
   });
 
   return NextResponse.json({ favorites });
-}
+});
 
-export async function POST(request: Request) {
+export const POST = withApiLogging(async (request: Request) => {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -44,4 +45,4 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ favorite }, { status: 201 });
-}
+});

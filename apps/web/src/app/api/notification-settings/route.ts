@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { withApiLogging } from "@/lib/logger";
 
 async function getAuthenticatedUserId(): Promise<string | null> {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,7 @@ const DEFAULT_SETTINGS = {
   reminderHoursBefore: 1,
 };
 
-export async function GET() {
+export const GET = withApiLogging(async () => {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,9 +26,9 @@ export async function GET() {
     userId,
     settings: DEFAULT_SETTINGS,
   });
-}
+});
 
-export async function PUT(request: Request) {
+export const PUT = withApiLogging(async (request: Request) => {
   const userId = await getAuthenticatedUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -45,4 +46,4 @@ export async function PUT(request: Request) {
     userId,
     settings,
   });
-}
+});

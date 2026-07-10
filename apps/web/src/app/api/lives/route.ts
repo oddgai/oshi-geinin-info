@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@oshi-geinin/db";
 import { authOptions } from "@/lib/auth";
+import { withApiLogging } from "@/lib/logger";
 
-export async function GET(request: Request) {
+export const GET = withApiLogging(async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const artistId = searchParams.get("artistId");
   const type = searchParams.get("type");
@@ -56,4 +57,4 @@ export async function GET(request: Request) {
   ]);
 
   return NextResponse.json({ lives, total, page, limit });
-}
+});

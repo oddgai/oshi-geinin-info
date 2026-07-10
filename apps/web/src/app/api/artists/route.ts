@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@oshi-geinin/db";
+import { withApiLogging } from "@/lib/logger";
 
-export async function GET(request: Request) {
+export const GET = withApiLogging(async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
   const page = Number(searchParams.get("page") ?? "1");
@@ -20,4 +21,4 @@ export async function GET(request: Request) {
   ]);
 
   return NextResponse.json({ artists, total, page, limit });
-}
+});
