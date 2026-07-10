@@ -1,5 +1,28 @@
 type Level = "INFO" | "WARN" | "ERROR";
 
+// 開発時（next dev = development）のみ ANSI カラーを付ける。
+// 本番ビルドの非 TTY ログにはエスケープを混ぜない。NO_COLOR は尊重する。
+// turbo 経由だと stdout が TTY 判定にならないため、TTY ではなく NODE_ENV で判定する。
+const USE_COLOR = !process.env.NO_COLOR && process.env.NODE_ENV !== "production";
+
+const ANSI = {
+  reset: "\x1b[0m",
+  blue: "\x1b[94m",
+  cyan: "\x1b[36m",
+  yellow: "\x1b[33m",
+  red: "\x1b[31m",
+} as const;
+
+function paint(code: string, text: string): string {
+  return USE_COLOR ? `${code}${text}${ANSI.reset}` : text;
+}
+
+const LEVEL_COLOR: Record<Level, string> = {
+  INFO: ANSI.cyan,
+  WARN: ANSI.yellow,
+  ERROR: ANSI.red,
+};
+
 /** HH:MM:SS（UTC）でタイムスタンプを返す。 */
 function timestamp(): string {
   return new Date().toISOString().slice(11, 19);
@@ -14,8 +37,10 @@ function logServer(level: Level, message: string, fields: Record<string, unknown
     .filter(([, v]) => v !== undefined && v !== null)
     .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
     .join(" ");
+  const tag = paint(ANSI.blue, "[server]");
+  const lvl = paint(LEVEL_COLOR[level], level);
   // biome/oxlint: サーバログは意図的に console を使う
-  console.log(`[server] [${timestamp()}] ${level} ${message}${suffix ? ` ${suffix}` : ""}`);
+  console.log(`${tag} [${timestamp()}] ${lvl} ${message}${suffix ? ` ${suffix}` : ""}`);
 }
 
 let seq = 0;
