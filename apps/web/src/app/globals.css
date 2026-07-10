@@ -1,3 +1,4 @@
+/* Tailwind v3 directives（PostCSS で処理される） */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
