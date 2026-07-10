@@ -2,7 +2,7 @@
   "name": "oshi-geinin-info",
   "private": true,
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "turbo dev --log-prefix=none",
     "build": "turbo build",
     "test": "turbo test",
     "lint": "oxlint --max-warnings=0",
