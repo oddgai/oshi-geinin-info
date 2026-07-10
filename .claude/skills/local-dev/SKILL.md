@@ -24,26 +24,42 @@ Turborepo monorepo（pnpm + turbo）のローカル開発手順。
 
 パッケージマネージャは `pnpm`（`packageManager` フィールドで固定）。`pnpm-workspace.yaml` で workspace を定義する。
 
-## セットアップ・起動
+## セットアップ・起動（ワンコマンド）
+
+前提: Docker が起動していること。`.env` を用意する（`cp .env.example .env` して LINE 認証情報を設定）。
 
 ```bash
-make install   # pnpm install（postinstall ビルドは pnpm-workspace.yaml の allowBuilds で制御）
-make dev       # turbo dev（各 workspace の dev を起動）
+make install   # 依存インストール（初回のみ。allowBuilds は pnpm-workspace.yaml で制御）
+make dev       # DB 起動(Docker) → スキーマ反映 → 開発サーバ を一括で起動
 ```
 
-- web: http://localhost:3000
+`make dev` は内部で `db-up`（Docker Compose で Postgres 起動 + healthy 待機）→ `prisma db push` → `turbo dev` を順に実行する。
 
-環境変数は `.env.example` を参照（`DATABASE_URL`, LINE / NextAuth トークン）。
+- web: http://localhost:3000 （Next.js が **フロント + API** の両方を担う。別の backend サーバは無い）
+- クローラー（`packages/crawler`）は AWS Lambda のバッチ処理で、ローカルで常駐起動するものではない
 
-## DB（Prisma）
+初回や空データ時はテスト用の芸人データを投入する:
 
 ```bash
-pnpm --filter @oshi-geinin/db db:generate  # Prisma Client 生成（build でも自動実行）
-pnpm --filter @oshi-geinin/db db:push      # スキーマを Supabase に反映
-pnpm --filter @oshi-geinin/db db:seed      # テスト用芸人データ投入
+make db-seed   # 芸人のシードデータ投入
 ```
 
-スキーマは `packages/db/prisma/schema.prisma`。`turbo build` は `@oshi-geinin/db#build`（= `prisma generate`）に依存するため、build/test 前に Client が生成される。
+## DB（Prisma / ローカル Postgres）
+
+ローカル DB は `compose.yaml` の Postgres（`localhost:55432`）。`make dev` が自動で起動する。
+
+```bash
+make db-up     # Postgres だけ起動（Docker Compose）
+make db-down   # 停止（データは名前付きボリュームに保持）
+make db-reset  # ボリューム削除 → 起動 → schema 反映 → seed（作り直し）
+make db-seed   # テスト用芸人データ投入
+
+# Prisma 個別操作
+pnpm --filter @oshi-geinin/db db:push      # スキーマ反映
+pnpm --filter @oshi-geinin/db db:generate  # Client 生成（build でも自動実行）
+```
+
+スキーマは `packages/db/prisma/schema.prisma`。`turbo build` は `@oshi-geinin/db#build`（= `prisma generate`）に依存するため、build/test 前に Client が生成される。本番の DB は Supabase を使う。
 
 ## 依存の追加
 

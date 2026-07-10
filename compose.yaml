@@ -1,0 +1,22 @@
+# ローカル開発用の PostgreSQL。本番は Supabase を使う。
+# ポートは .env の DATABASE_URL（localhost:55432）に合わせる。
+services:
+  db:
+    image: postgres:16
+    container_name: oshi-pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oshi
+    ports:
+      - "55432:5432"
+    volumes:
+      - oshi-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d oshi"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  oshi-pg-data:

@@ -5,6 +5,9 @@
 # （非固定だと新リリースで「無変更なのに CI が落ちる」事故が起きるため）。
 PNPM := pnpm
 
+# docker compose（プラグイン）か docker-compose（スタンドアロン）を自動選択する
+COMPOSE := $(shell docker compose version >/dev/null 2>&1 && echo "docker compose" || echo "docker-compose")
+
 .PHONY: help
 help: ## このヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -13,6 +16,25 @@ help: ## このヘルプを表示
 .PHONY: install
 install: ## 依存をインストール
 	$(PNPM) install
+
+.PHONY: db-up
+db-up: ## ローカル Postgres を起動（Docker Compose、healthy まで待機）
+	$(COMPOSE) up -d --wait
+
+.PHONY: db-down
+db-down: ## ローカル Postgres を停止（データは保持）
+	$(COMPOSE) down
+
+.PHONY: db-reset
+db-reset: ## DB を作り直す（ボリューム削除 → 起動 → スキーマ反映 → seed）
+	$(COMPOSE) down -v
+	$(COMPOSE) up -d --wait
+	$(PNPM) --filter @oshi-geinin/db db:push
+	$(PNPM) --filter @oshi-geinin/db db:seed
+
+.PHONY: db-seed
+db-seed: ## テスト用データ（芸人）を投入
+	$(PNPM) --filter @oshi-geinin/db db:seed
 
 .PHONY: check
 check: lint fmt-check knip ## PR 前のゲート（lint + format チェック + 未使用検出）
@@ -43,7 +65,8 @@ test: ## テスト（turbo）
 	$(PNPM) test
 
 .PHONY: dev
-dev: ## 開発サーバを起動（turbo）
+dev: db-up ## ワンコマンド起動: DB 起動 → スキーマ反映 → 開発サーバ（turbo）
+	$(PNPM) --filter @oshi-geinin/db db:push
 	$(PNPM) dev
 
 .PHONY: hooks

@@ -63,12 +63,13 @@ CI（`.github/workflows/ci.yml`）は以下のジョブで構成する。いず�
 `Makefile` が開発タスクのエントリポイント（`make help` で一覧）。
 
 - `make install` … 依存インストール（`pnpm install`）
-- `make dev` … 開発サーバ起動（`turbo dev`）
+- `make dev` … **ワンコマンド起動**: ローカル Postgres(Docker) 起動 → スキーマ反映 → 開発サーバ（turbo）
+- `make db-up` / `make db-down` / `make db-reset` / `make db-seed` … ローカル DB 操作
 - `make build` / `make test` … ビルド / テスト（turbo）
 - `make check` … PR 前ゲート（lint + fmt-check + knip）
 - `make fmt` … 整形（oxfmt + oxlint --fix）
 
-DB は Prisma。スキーマ変更後は `pnpm --filter @oshi-geinin/db db:generate`、Supabase へは `db:push`。ローカル開発の詳細は `.claude/skills/local-dev/SKILL.md` を参照。
+ローカル DB は `compose.yaml` の Postgres（`localhost:55432`）。web（Next.js）が **フロント + API** を兼ねるため別の backend サーバは無く、クローラーは Lambda バッチ。本番 DB は Supabase。詳細は `.claude/skills/local-dev/SKILL.md` を参照。
 
 ## 全般
 
