@@ -1,28 +1,15 @@
 import type { NextAuthOptions } from "next-auth";
+import LineProvider from "next-auth/providers/line";
 import { prisma } from "@oshi-geinin/db";
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    {
-      id: "line",
-      name: "LINE",
-      type: "oauth",
-      authorization: {
-        url: "https://access.line.me/oauth2/v2.1/authorize",
-        params: { scope: "profile openid" },
-      },
-      token: "https://api.line.me/oauth2/v2.1/token",
-      userinfo: "https://api.line.me/v2/profile",
-      clientId: process.env.LINE_CHANNEL_ID,
-      clientSecret: process.env.LINE_CHANNEL_SECRET,
-      profile(profile) {
-        return {
-          id: profile.userId,
-          name: profile.displayName,
-          image: profile.pictureUrl,
-        };
-      },
-    },
+    // LINE の id_token は HS256 署名。標準 provider が wellKnown / idToken /
+    // id_token_signed_response_alg=HS256 を正しく設定してくれる。
+    LineProvider({
+      clientId: process.env.LINE_CHANNEL_ID ?? "",
+      clientSecret: process.env.LINE_CHANNEL_SECRET ?? "",
+    }),
   ],
   callbacks: {
     async signIn({ user }) {
