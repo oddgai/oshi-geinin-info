@@ -1,0 +1,22 @@
+{
+  "name": "oshi-geinin-info",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev --log-prefix=none",
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "oxlint --max-warnings=0",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --write",
+    "format:check": "oxfmt --check",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "knip": "6.18.0",
+    "oxfmt": "0.56.0",
+    "oxlint": "1.71.0",
+    "turbo": "^2",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@11.9.0"
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "apps/web": {
+      "entry": ["src/app/**/{page,layout,route,loading,error,not-found,template}.{ts,tsx}"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "packages/crawler": {
+      "entry": ["src/handler.ts", "src/reminder.ts"],
+      "project": "src/**/*.ts",
+      "ignoreDependencies": ["@sparticuz/chromium"]
+    },
+    "packages/db": {
+      "project": "src/**/*.ts"
+    },
+    "packages/shared": {
+      "project": "src/**/*.ts"
+    },
+    "infra": {
+      "entry": ["stacks/*.ts"],
+      "project": "**/*.ts",
+      "ignoreDependencies": ["aws-cdk-lib", "constructs"]
+    }
+  }
+}

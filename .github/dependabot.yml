@@ -16,9 +16,9 @@ updates:
           - minor
           - patch
 
-  # backend（uv）
-  - package-ecosystem: uv
-    directory: /backend
+  # npm（pnpm workspace 全体を走査。pnpm-lock.yaml に対応）
+  - package-ecosystem: npm
+    directory: /
     schedule:
       interval: weekly
     labels:
@@ -26,23 +26,7 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      backend:
-        patterns: ["*"]
-        update-types:
-          - minor
-          - patch
-
-  # frontend（uv）
-  - package-ecosystem: uv
-    directory: /frontend
-    schedule:
-      interval: weekly
-    labels:
-      - dependencies
-    cooldown:
-      default-days: 7
-    groups:
-      frontend:
+      npm:
         patterns: ["*"]
         update-types:
           - minor

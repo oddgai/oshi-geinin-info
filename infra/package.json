@@ -1,0 +1,10 @@
+{
+  "name": "@oshi-geinin/infra",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "aws-cdk-lib": "^2",
+    "constructs": "^10",
+    "sst": "^2"
+  }
+}
